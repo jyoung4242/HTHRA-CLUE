@@ -5,8 +5,7 @@ export default class MapManager {
   constructor(state: any) {
     this.state = state;
     this.template = `
-    <div class="map" \${m<=*map.selectMap:id} style="background-image: \${m.src}; width: \${m.w}; height: \${m.h};">
-    \${m.str}
+    <div class="map" \${m<=*map.selectMap:id} style="transform: translate( \${m.x}px, \${m.y}px); background-image: url(\${m.src}); width: \${m.w}px; height: \${m.h}px; z-index: \${m.z};">
     </div>
     `;
   }

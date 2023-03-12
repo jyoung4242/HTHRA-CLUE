@@ -1,4 +1,6 @@
 type MapData = Record<string, Array<object>>;
+import hero from "../assets/images/hero.png";
+import GameObject from "../lib/gObject";
 
 export enum GameState {
   NONE,
@@ -20,10 +22,11 @@ export default class State {
         },
       },
       camera: {
-        x: 10,
-        y: 20,
-        w: 25,
-        h: 25,
+        x: 0,
+        y: 0,
+        w: 200,
+        h: 200,
+        scale: 3,
       },
       map: {
         currentMap: "none",
@@ -32,6 +35,26 @@ export default class State {
           return this.maps[this.currentMap];
         },
       },
+      objects: [
+        new GameObject({
+          id: 0,
+          sprtposX: 0,
+          sprtposY: 0,
+          src: hero,
+          x: 50,
+          y: 70,
+          w: 32,
+          h: 32,
+          bgndw: 128,
+          bgndh: 128,
+          z: 3,
+          type: "player",
+          shadow: true,
+          direction: "down",
+          status: "idle",
+          framerate: 2,
+        }),
+      ],
     };
   }
 }
