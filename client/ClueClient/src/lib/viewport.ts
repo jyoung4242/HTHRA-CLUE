@@ -15,5 +15,11 @@ export default class Viewport {
       </div>
     </div>
     `;
+    this.state.viewport.x = width;
+    this.state.viewport.y = height;
+  }
+
+  update() {
+    this.camera.update();
   }
 }

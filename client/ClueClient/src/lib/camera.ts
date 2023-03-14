@@ -43,13 +43,47 @@ export default class Camera {
     </div>
     `;
     const demoMap = [
-      { id: 0, w: 192, h: 192, src: `${DemoLower}`, z: 0 },
-      { id: 1, w: 192, h: 192, src: `${DemoUpper}`, z: 5 },
+      {
+        id: 0,
+        w: 192,
+        h: 192,
+        src: `${DemoLower}`,
+        z: 0,
+        walls: [],
+      },
+      {
+        id: 1,
+        w: 192,
+        h: 192,
+        src: `${DemoUpper}`,
+        z: 5,
+        walls: [
+          { x: 48, y: 45, w: 28, h: 24 },
+          { x: 0, y: 35, w: 100, h: 27 },
+          { x: 0, y: 0, w: 12, h: 170 },
+          { x: 0, y: 160, w: 76, h: 15 },
+          { x: 65, y: 175, w: 30, h: 5 },
+          { x: 96, y: 160, w: 75, h: 15 },
+          { x: 110, y: 96, w: 32, h: 28 },
+          { x: 96, y: 45, w: 11, h: 32 },
+          { x: 103, y: 40, w: 20, h: 20 },
+          { x: 128, y: 45, w: 12, h: 32 },
+          { x: 136, y: 35, w: 32, h: 27 },
+          { x: 172, y: 0, w: 5, h: 170 },
+        ],
+      },
     ];
+
     this.mapManager.loadMap("demo", demoMap);
     this.mapManager.switchMap("demo");
   }
   shake() {}
   flash() {}
   follow() {}
+  update() {
+    let targetpositionX = this.state.viewport.x / 6 - this.state.objects[0].w / 2;
+    let targetpositionY = this.state.viewport.y / 6 - this.state.objects[0].h / 2;
+    this.state.camera.x = targetpositionX - this.state.objects[0].x;
+    this.state.camera.y = targetpositionY - this.state.objects[0].y;
+  }
 }

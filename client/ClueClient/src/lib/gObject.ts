@@ -3,6 +3,7 @@ type statusTypes = "idle" | "walk";
 type directionTypes = "up" | "down" | "left" | "right";
 
 export default class GameObject {
+  state: any;
   id = 0;
   sprtposX = 0;
   sprtposY = 0;
@@ -26,6 +27,7 @@ export default class GameObject {
   frame = 0;
   oldstatus: statusTypes;
   olddirection: directionTypes;
+  borderbox: any;
   animations = {
     "idle-down": [[0, 0]],
     "idle-up": [[0, 2 * 32]],
@@ -57,7 +59,8 @@ export default class GameObject {
     ],
   };
 
-  constructor(config: any) {
+  constructor(state: any, config: any) {
+    this.state = state;
     this.id = config.id;
     this.sprtposX = config.sprtposX;
     this.sprtposY = config.sprtposY;
@@ -77,6 +80,7 @@ export default class GameObject {
     this.olddirection = this.direction;
     this.oldstatus = this.status;
     this.framesizeX = this.bgndw / this.w;
+    this.borderbox = config.borderbox;
   }
 
   get currentframe() {
@@ -91,7 +95,6 @@ export default class GameObject {
     if (this.type == "player" && this.status == "walk") {
       //sequence changed
       if (this.olddirection != this.direction || this.status != this.oldstatus) {
-        console.log("im here");
         this.tik = 0;
         this.frame = 0;
         this.currentAnimation = this.getAnimation(this.direction, this.status);

@@ -34,7 +34,7 @@ export default class KeyboardManagement {
                 this.keyLeft = true;
                 this.state.objects[0].direction = "left";
                 this.lastkey = "left";
-                this.state.objects[0].x -= WALKSPEED;
+                if (this.state.map.wallcheck()) this.state.objects[0].x -= WALKSPEED;
               }
 
               break;
@@ -43,7 +43,7 @@ export default class KeyboardManagement {
                 this.state.objects[0].direction = "right";
                 this.keyRight = true;
                 this.lastkey = "right";
-                this.state.objects[0].x += WALKSPEED;
+                if (this.state.map.wallcheck()) this.state.objects[0].x += WALKSPEED;
               }
 
               break;
@@ -52,7 +52,7 @@ export default class KeyboardManagement {
                 this.state.objects[0].direction = "up";
                 this.keyUp = true;
                 this.lastkey = "up";
-                this.state.objects[0].y -= WALKSPEED;
+                if (this.state.map.wallcheck()) this.state.objects[0].y -= WALKSPEED;
               }
 
               break;
@@ -61,7 +61,7 @@ export default class KeyboardManagement {
                 this.state.objects[0].direction = "down";
                 this.lastkey = "down";
                 this.keyDown = true;
-                this.state.objects[0].y += WALKSPEED;
+                if (this.state.map.wallcheck()) this.state.objects[0].y += WALKSPEED;
               }
               break;
           }
@@ -82,7 +82,6 @@ export default class KeyboardManagement {
           }
 
           if (!this.keyDown && !this.keyUp && !this.keyLeft && !this.keyRight) {
-            console.log("sending idle");
             this.state.objects[0].status = "idle";
             this.lastkey = null;
           }

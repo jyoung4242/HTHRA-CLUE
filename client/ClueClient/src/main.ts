@@ -25,4 +25,5 @@ setInterval(() => {
   model.objects.forEach((obj: any) => {
     obj.update();
   });
+  viewport.update();
 }, 50);
