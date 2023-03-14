@@ -6,7 +6,7 @@ export default class MapManager {
     this.state = state;
     this.template = `
     <div class="map" \${m<=*map.selectMap:id} style="transform: translate( \${m.x}px, \${m.y}px); background-image: url(\${m.src}); width: \${m.w}px; height: \${m.h}px; z-index: \${m.z};">
-      <div class="wall" \${w<=*m.walls} style="transform: translate( \${w.x}px, \${w.y}px); width: \${w.w}px; height: \${w.h}px; z-index: 6; border: 1px solid yellow;">
+      <div class="wall" \${w<=*m.walls} style="transform: translate( \${w.x}px, \${w.y}px); width: \${w.w}px; height: \${w.h}px; z-index: 6; ">
       </div>
     </div>
     `;
