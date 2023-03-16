@@ -42,21 +42,9 @@ export default class Camera {
       
     </div>
     `;
-    const demoMap = [
-      {
-        id: 0,
-        w: 192,
-        h: 192,
-        src: `${DemoLower}`,
-        z: 0,
-        walls: [],
-      },
-      {
-        id: 1,
-        w: 192,
-        h: 192,
-        src: `${DemoUpper}`,
-        z: 5,
+    const demoMap = {
+      config: {
+        triggers: [{ x: 107, y: 45, w: 24, h: 24, actions: [{ type: "popup", text: "CUTSCENE STARTED!" }] }],
         walls: [
           { x: 48, y: 45, w: 28, h: 24 },
           { x: 0, y: 35, w: 100, h: 27 },
@@ -72,8 +60,25 @@ export default class Camera {
           { x: 172, y: 0, w: 5, h: 170 },
         ],
       },
-    ];
+      layers: [
+        {
+          id: 0,
+          w: 192,
+          h: 192,
+          src: `${DemoLower}`,
+          z: 0,
+        },
+        {
+          id: 1,
+          w: 192,
+          h: 192,
+          src: `${DemoUpper}`,
+          z: 5,
+        },
+      ],
+    };
 
+    this.state.camera.follow = this.state.objects[0];
     this.mapManager.loadMap("demo", demoMap);
     this.mapManager.switchMap("demo");
   }
@@ -81,9 +86,9 @@ export default class Camera {
   flash() {}
   follow() {}
   update() {
-    let targetpositionX = this.state.viewport.x / 6 - this.state.objects[0].w / 2;
-    let targetpositionY = this.state.viewport.y / 6 - this.state.objects[0].h / 2;
-    this.state.camera.x = targetpositionX - this.state.objects[0].x;
-    this.state.camera.y = targetpositionY - this.state.objects[0].y;
+    let targetpositionX = this.state.viewport.x / 6 - this.state.camera.follow.w / 2;
+    let targetpositionY = this.state.viewport.y / 6 - this.state.camera.follow.h / 2;
+    this.state.camera.x = targetpositionX - this.state.camera.follow.x;
+    this.state.camera.y = targetpositionY - this.state.camera.follow.y;
   }
 }

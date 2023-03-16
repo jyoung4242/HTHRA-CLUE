@@ -1,7 +1,8 @@
-type MapData = Record<string, Array<object>>;
+type MapData = Record<string, mapConfig>;
 import hero from "../assets/images/hero.png";
 import npc1 from "../assets/images/npc2.png";
 import GameObject from "../lib/gObject";
+import { mapConfig, mapConfigData } from "../lib/mapmanager";
 
 export enum GameState {
   NONE,
@@ -33,12 +34,22 @@ export default class State {
         w: 200,
         h: 200,
         scale: 3,
+        follow: <GameObject | null>null,
       },
       map: {
-        currentMap: "none",
+        currentMap: <keyof mapConfigData>"none",
+        showWalls: false,
+        showTriggers: false,
         maps: <MapData>{},
+        configs: <any>{},
         get selectMap() {
           return this.maps[this.currentMap];
+        },
+        get getWalls() {
+          return this.configs[this.currentMap].walls;
+        },
+        get getTriggers() {
+          return this.configs[this.currentMap].triggers;
         },
         wallcheck: () => {
           if (!this.state.map) return false;
@@ -139,7 +150,7 @@ export default class State {
           status: "idle",
           framerate: 2,
           borderbox: {
-            enabled: true,
+            enabled: false,
             w: 14,
             h: 8,
             x: 8,
@@ -153,7 +164,7 @@ export default class State {
           sprtposY: 0,
           src: npc1,
           x: 28,
-          y: 112,
+          y: 112, //60
           w: 32,
           h: 32,
           bgndw: 128,
@@ -165,7 +176,7 @@ export default class State {
           status: "idle",
           framerate: 2,
           borderbox: {
-            enabled: true,
+            enabled: false,
             w: 14,
             h: 8,
             x: 8,

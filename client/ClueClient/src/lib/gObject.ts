@@ -1,12 +1,15 @@
 type animationTypes = `${statusTypes}-${directionTypes}`;
 type statusTypes = "idle" | "walk";
-type directionTypes = "up" | "down" | "left" | "right";
+export type directionTypes = "up" | "down" | "left" | "right";
 
+import CollisionManager from "./collision";
 import OverworldEvent from "./OverworldEvent";
 import { WALKSPEED } from "./keyboard";
 
 export default class GameObject {
   state: any;
+  cm;
+  isColliding = false;
   id = 0;
   sprtposX = 0;
   sprtposY = 0;
@@ -17,7 +20,28 @@ export default class GameObject {
   h = 32;
   bgndw = 128;
   bgndh = 128;
-  z = 3;
+  //z = 3;
+  get z() {
+    //check z-index
+    if (this.type == "npc") {
+      if (
+        this.y + this.borderbox.y + this.borderbox.h / 2 <
+        this.state.state.objects[0].y + this.state.state.objects[0].borderbox.y + this.state.state.objects[0].borderbox.h / 2
+      ) {
+        if (
+          this.x + 15 >= this.state.state.objects[0].x + this.state.state.objects[0].borderbox.x &&
+          this.x - 15 <=
+            this.state.state.objects[0].x + this.state.state.objects[0].borderbox.x + this.state.state.objects[0].borderbox.w
+        ) {
+          return 2;
+        } else {
+          return 3;
+        }
+      } else {
+        return 3;
+      }
+    } else return 3;
+  }
   type = "";
   shadow = false;
   direction: directionTypes = "down";
@@ -68,6 +92,7 @@ export default class GameObject {
 
   constructor(state: any, config: any) {
     this.state = state;
+    this.cm = new CollisionManager(state);
     this.id = config.id;
     this.sprtposX = config.sprtposX;
     this.sprtposY = config.sprtposY;
@@ -78,7 +103,7 @@ export default class GameObject {
     this.h = config.h;
     this.bgndh = config.bgndh;
     this.bgndw = config.bgndw;
-    this.z = config.z;
+
     this.type = config.type;
     this.shadow = config.shadow;
     this.direction = config.direction;
@@ -122,6 +147,17 @@ export default class GameObject {
   }
 
   updatePosition() {
+    //check for collision
+    let allObjects = this.state.state.objects.filter((obj: any) => {
+      return obj.id != this.id;
+    });
+    for (let index = 0; index < allObjects.length; index++) {
+      const element = allObjects[index];
+      if (this.cm.isObjectColliding(element, this)) return;
+      this.isColliding = false;
+    }
+
+    if (this.isColliding) return;
     this.movingProgressRemaining -= 1;
     switch (this.direction) {
       case "down":
@@ -147,15 +183,6 @@ export default class GameObject {
   startBehavior(behavior: any) {
     this.direction = behavior.direction;
     if (behavior.type === "walk") {
-      //TODO add collision check
-
-      /*  if (state.map.isSpaceTaken(this.x, this.y, this.direction)) {
-        behavior.retry &&
-          setTimeout(() => {
-            this.startBehavior(state, behavior);
-          }, 10);
-        return;
-      } */
       this.movingProgressRemaining = behavior.distance / 3;
       this.status = "walk";
     }
@@ -172,8 +199,8 @@ export default class GameObject {
   }
 
   update() {
-    //update position if moving
     if (this.movingProgressRemaining > 0) {
+      //update position if moving
       this.updatePosition();
     }
     //update animations

@@ -1,4 +1,4 @@
-type OverworldEventType = "walk" | "stand";
+type OverworldEventType = "walk" | "stand" | "popup";
 
 type OverworldEventParam = {
   who: number;
@@ -6,6 +6,7 @@ type OverworldEventParam = {
   direction?: "up" | "down" | "left" | "right";
   duration?: number;
   distance?: number;
+  text?: string;
 };
 
 export default class OverworldEvent {
@@ -17,6 +18,12 @@ export default class OverworldEvent {
     //this.map = map;
     this.state = state;
     this.event = event;
+  }
+
+  popup(resolve: any) {
+    window.alert(this.event.text);
+    console.log("popup event: ", this.event.text);
+    resolve();
   }
 
   stand(resolve: any) {
