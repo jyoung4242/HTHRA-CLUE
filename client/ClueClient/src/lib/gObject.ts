@@ -1,9 +1,15 @@
 type animationTypes = `${statusTypes}-${directionTypes}`;
 type statusTypes = "idle" | "walk";
-type directionTypes = "up" | "down" | "left" | "right";
+export type directionTypes = "up" | "down" | "left" | "right";
+
+import CollisionManager from "./collision";
+import OverworldEvent from "./OverworldEvent";
+import { WALKSPEED } from "./keyboard";
 
 export default class GameObject {
   state: any;
+  cm;
+  isColliding = false;
   id = 0;
   sprtposX = 0;
   sprtposY = 0;
@@ -14,7 +20,28 @@ export default class GameObject {
   h = 32;
   bgndw = 128;
   bgndh = 128;
-  z = 3;
+  //z = 3;
+  get z() {
+    //check z-index
+    if (this.type == "npc") {
+      if (
+        this.y + this.borderbox.y + this.borderbox.h / 2 <
+        this.state.state.objects[0].y + this.state.state.objects[0].borderbox.y + this.state.state.objects[0].borderbox.h / 2
+      ) {
+        if (
+          this.x + 15 >= this.state.state.objects[0].x + this.state.state.objects[0].borderbox.x &&
+          this.x - 15 <=
+            this.state.state.objects[0].x + this.state.state.objects[0].borderbox.x + this.state.state.objects[0].borderbox.w
+        ) {
+          return 2;
+        } else {
+          return 3;
+        }
+      } else {
+        return 3;
+      }
+    } else return 3;
+  }
   type = "";
   shadow = false;
   direction: directionTypes = "down";
@@ -28,6 +55,10 @@ export default class GameObject {
   oldstatus: statusTypes;
   olddirection: directionTypes;
   borderbox: any;
+  isStanding: any = false;
+  behaviorLoopIndex = 0;
+  behaviorLoop: any;
+  movingProgressRemaining = 0;
   animations = {
     "idle-down": [[0, 0]],
     "idle-up": [[0, 2 * 32]],
@@ -61,6 +92,7 @@ export default class GameObject {
 
   constructor(state: any, config: any) {
     this.state = state;
+    this.cm = new CollisionManager(state);
     this.id = config.id;
     this.sprtposX = config.sprtposX;
     this.sprtposY = config.sprtposY;
@@ -71,7 +103,7 @@ export default class GameObject {
     this.h = config.h;
     this.bgndh = config.bgndh;
     this.bgndw = config.bgndw;
-    this.z = config.z;
+
     this.type = config.type;
     this.shadow = config.shadow;
     this.direction = config.direction;
@@ -81,6 +113,13 @@ export default class GameObject {
     this.oldstatus = this.status;
     this.framesizeX = this.bgndw / this.w;
     this.borderbox = config.borderbox;
+    this.behaviorLoop = config.behaviorLoop;
+
+    if (this.behaviorLoop.length != 0) {
+      setTimeout(() => {
+        this.doBehaviorEvent();
+      }, 20);
+    }
   }
 
   get currentframe() {
@@ -91,8 +130,81 @@ export default class GameObject {
     return `${stat}-${dir}`;
   }
 
+  async doBehaviorEvent() {
+    if (this.state.state.cutscenes.isCutscenePlaying || this.behaviorLoop.length === 0 || this.isStanding) return;
+
+    let eventConfig = this.behaviorLoop[this.behaviorLoopIndex];
+
+    eventConfig.who = this.id;
+    const eventHandler = new OverworldEvent({ state: this.state.state, event: eventConfig });
+    await eventHandler.init();
+
+    this.behaviorLoopIndex += 1;
+    if (this.behaviorLoopIndex === this.behaviorLoop.length) {
+      this.behaviorLoopIndex = 0;
+    }
+    this.doBehaviorEvent();
+  }
+
+  updatePosition() {
+    //check for collision
+    let allObjects = this.state.state.objects.filter((obj: any) => {
+      return obj.id != this.id;
+    });
+    for (let index = 0; index < allObjects.length; index++) {
+      const element = allObjects[index];
+      if (this.cm.isObjectColliding(element, this)) return;
+      this.isColliding = false;
+    }
+
+    if (this.isColliding) return;
+    this.movingProgressRemaining -= 1;
+    switch (this.direction) {
+      case "down":
+        this.y += WALKSPEED;
+        break;
+      case "up":
+        this.y -= WALKSPEED;
+        break;
+      case "left":
+        this.x -= WALKSPEED;
+        break;
+      case "right":
+        this.x += WALKSPEED;
+        break;
+    }
+    if (this.movingProgressRemaining === 0) {
+      //trigger event
+      const event = new CustomEvent("PersonWalkingComplete", { detail: { whoID: this.id } });
+      document.dispatchEvent(event);
+    }
+  }
+
+  startBehavior(behavior: any) {
+    this.direction = behavior.direction;
+    if (behavior.type === "walk") {
+      this.movingProgressRemaining = behavior.distance / 3;
+      this.status = "walk";
+    }
+
+    if (behavior.type === "stand") {
+      this.status = "idle";
+      this.isStanding = true;
+      setTimeout(() => {
+        const event = new CustomEvent("PersonStandComplete", { detail: { whoID: this.id } });
+        document.dispatchEvent(event);
+        this.isStanding = false;
+      }, behavior.time);
+    }
+  }
+
   update() {
-    if (this.type == "player" && this.status == "walk") {
+    if (this.movingProgressRemaining > 0) {
+      //update position if moving
+      this.updatePosition();
+    }
+    //update animations
+    if ((this.type == "player" || this.type == "npc") && this.status == "walk") {
       //sequence changed
       if (this.olddirection != this.direction || this.status != this.oldstatus) {
         this.tik = 0;
@@ -114,7 +226,7 @@ export default class GameObject {
 
       this.sprtposX = this.animations[this.currentAnimation][this.frame][0];
       this.sprtposY = this.animations[this.currentAnimation][this.frame][1];
-    } else if (this.type == "player" && this.status == "idle") {
+    } else if ((this.type == "player" || this.type == "npc") && this.status == "idle") {
       //idle
       this.frame = 0;
       this.currentAnimation = this.getAnimation(this.direction, this.status);

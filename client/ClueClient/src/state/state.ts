@@ -1,6 +1,8 @@
-type MapData = Record<string, Array<object>>;
+type MapData = Record<string, mapConfig>;
 import hero from "../assets/images/hero.png";
+import npc1 from "../assets/images/npc2.png";
 import GameObject from "../lib/gObject";
+import { mapConfig, mapConfigData } from "../lib/mapmanager";
 
 export enum GameState {
   NONE,
@@ -32,12 +34,22 @@ export default class State {
         w: 200,
         h: 200,
         scale: 3,
+        follow: <GameObject | null>null,
       },
       map: {
-        currentMap: "none",
+        currentMap: <keyof mapConfigData>"none",
+        showWalls: false,
+        showTriggers: false,
         maps: <MapData>{},
+        configs: <any>{},
         get selectMap() {
           return this.maps[this.currentMap];
+        },
+        get getWalls() {
+          return this.configs[this.currentMap].walls;
+        },
+        get getTriggers() {
+          return this.configs[this.currentMap].triggers;
         },
         wallcheck: () => {
           if (!this.state.map) return false;
@@ -67,7 +79,7 @@ export default class State {
             let b = calcCollisionBox(player);
             if (a.x < b.x + b.w && a.x + a.w >= b.x) {
               const distance = a.y + a.h - b.y;
-              console.log("up check: ", distance);
+              //console.log("up check: ", distance);
               if (distance > -3 && distance <= 0) return false;
             }
 
@@ -89,7 +101,7 @@ export default class State {
             let b = calcCollisionBox(player);
             if (a.y < b.y + b.h && a.y + a.h >= b.y) {
               const distance = a.x - (b.x + b.w);
-              console.log("right check: ", distance);
+              //console.log("right check: ", distance);
               if (distance > -3 && distance <= 0) return false;
             }
 
@@ -138,14 +150,57 @@ export default class State {
           status: "idle",
           framerate: 2,
           borderbox: {
-            enabled: true,
+            enabled: false,
             w: 14,
             h: 8,
             x: 8,
             y: 24,
           },
+          behaviorLoop: [],
+        }),
+        new GameObject(this, {
+          id: 1,
+          sprtposX: 0,
+          sprtposY: 0,
+          src: npc1,
+          x: 28,
+          y: 112, //60
+          w: 32,
+          h: 32,
+          bgndw: 128,
+          bgndh: 128,
+          z: 3,
+          type: "npc",
+          shadow: true,
+          direction: "down",
+          status: "idle",
+          framerate: 2,
+          borderbox: {
+            enabled: false,
+            w: 14,
+            h: 8,
+            x: 8,
+            y: 24,
+          },
+          behaviorLoop: [
+            { type: "walk", direction: "up", distance: 24 },
+            { type: "stand", direction: "left", duration: 750 },
+            { type: "stand", direction: "down", duration: 750 },
+            { type: "walk", direction: "right", distance: 24 },
+            { type: "stand", direction: "up", duration: 750 },
+            { type: "stand", direction: "left", duration: 750 },
+            { type: "walk", direction: "down", distance: 24 },
+            { type: "stand", direction: "right", duration: 750 },
+            { type: "stand", direction: "up", duration: 750 },
+            { type: "walk", direction: "left", distance: 24 },
+            { type: "stand", direction: "right", duration: 750 },
+            { type: "stand", direction: "down", duration: 750 },
+          ],
         }),
       ],
+      cutscenes: {
+        isCutscenePlaying: false,
+      },
     };
   }
 }

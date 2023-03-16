@@ -8,7 +8,7 @@ import KeyboardManagement from "./lib/keyboard";
 
 const model = new State().state;
 const viewport = new Viewport(800, 600, model);
-const networkConnection = new HathoraInterface(model);
+//const networkConnection = new HathoraInterface(model);
 const keyboardmgr = new KeyboardManagement(model);
 
 const template = `
@@ -19,7 +19,6 @@ const template = `
 
 UI.create(document.body, template, model);
 UI.initialize(1000 / 60);
-console.log(model);
 
 setInterval(() => {
   model.objects.forEach((obj: any) => {
