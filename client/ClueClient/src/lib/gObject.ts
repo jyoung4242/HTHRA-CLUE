@@ -55,6 +55,7 @@ export default class GameObject {
   oldstatus: statusTypes;
   olddirection: directionTypes;
   borderbox: any;
+  interact: any;
   isStanding: any = false;
   behaviorLoopIndex = 0;
   behaviorLoop: any;
@@ -114,6 +115,7 @@ export default class GameObject {
     this.framesizeX = this.bgndw / this.w;
     this.borderbox = config.borderbox;
     this.behaviorLoop = config.behaviorLoop;
+    this.interact = config.interact;
 
     if (this.behaviorLoop.length != 0) {
       setTimeout(() => {

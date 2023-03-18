@@ -3,6 +3,7 @@ import hero from "../assets/images/hero.png";
 import npc1 from "../assets/images/npc2.png";
 import GameObject from "../lib/gObject";
 import { mapConfig, mapConfigData } from "../lib/mapmanager";
+import sf from "./storyflags.json";
 
 export enum GameState {
   NONE,
@@ -27,7 +28,6 @@ export default class State {
         x: 0,
         y: 0,
       },
-
       camera: {
         x: 0,
         y: 0,
@@ -182,6 +182,7 @@ export default class State {
             x: 8,
             y: 24,
           },
+          interact: [{ type: "dialog", dialogId: "npc2dialog" }],
           behaviorLoop: [
             { type: "walk", direction: "up", distance: 24 },
             { type: "stand", direction: "left", duration: 750 },
@@ -201,6 +202,48 @@ export default class State {
       cutscenes: {
         isCutscenePlaying: false,
       },
+      dialog: {
+        dm: undefined,
+        isVisible: false,
+        leftAvatar: "",
+        rightAvatar: "",
+        dialogID: "",
+        style: "basic",
+        typeSpeed: 100,
+        message: "",
+        showNext: false,
+        showDone: false,
+        choices: [],
+        choicemade: (_event: any, _model: any, element: any, _object: any) => {
+          //set story flags
+          this.state.dialog.dm.setSF((element as HTMLElement).getAttribute("data-choice"));
+          //finish dialog
+          this.state.dialog.dm.endDialog();
+          const event = new CustomEvent("DialogComplete", { detail: { whoID: this.state.objects[0] } });
+          document.dispatchEvent(event);
+        },
+        get isChoices() {
+          return this.style == "right_interact" || this.style == "left_interact";
+        },
+        get isLeft() {
+          return this.style == "left" || this.style == "left_interact";
+        },
+        get isRight() {
+          return this.style == "right" || this.style == "right_interact";
+        },
+        get isBasic() {
+          return this.style == "basic";
+        },
+        nextMessage: () => {
+          this.state.dialog.dm.nextMessage();
+        },
+        doneMessage: () => {
+          this.state.dialog.dm.endDialog();
+          const event = new CustomEvent("DialogComplete", { detail: { whoID: this.state.objects[0] } });
+          document.dispatchEvent(event);
+        },
+      },
+      storyflags: sf,
     };
   }
 }

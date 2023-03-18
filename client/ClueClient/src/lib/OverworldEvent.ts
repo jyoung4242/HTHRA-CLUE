@@ -1,4 +1,4 @@
-type OverworldEventType = "walk" | "stand" | "popup";
+type OverworldEventType = "walk" | "stand" | "console" | "dialog";
 
 type OverworldEventParam = {
   who: number;
@@ -7,7 +7,10 @@ type OverworldEventParam = {
   duration?: number;
   distance?: number;
   text?: string;
+  dialogId: string;
 };
+
+import SF from "../state/storyflags.json";
 
 export default class OverworldEvent {
   //map: any;
@@ -20,8 +23,7 @@ export default class OverworldEvent {
     this.event = event;
   }
 
-  popup(resolve: any) {
-    window.alert(this.event.text);
+  console(resolve: any) {
     console.log("popup event: ", this.event.text);
     resolve();
   }
@@ -77,6 +79,22 @@ export default class OverworldEvent {
     };
 
     document.addEventListener("PersonWalkingComplete", completeHandler);
+  }
+
+  dialog(resolve: any) {
+    const textcompleteHandler = (e: any) => {
+      console.log("done: ", e.detail.whoID, this.event.who);
+      if (e.detail.whoID === this.event.who) {
+        document.removeEventListener("DialogComplete", textcompleteHandler);
+        this.state.cutscenes.isCutscenePlaying = false;
+        resolve();
+      }
+    };
+
+    this.state.cutscenes.isCutscenePlaying = true;
+    this.state.dialog.dialogID = this.event.dialogId;
+    document.addEventListener("DialogComplete", textcompleteHandler);
+    this.state.dialog.dm.startDialog(this.event.dialogId);
   }
   /* 
   textMessage(resolve: any) {

@@ -1,0 +1,6 @@
+{
+  "0": {
+    "conditions": {},
+    "content": [{ "type": "basic", "speed": 80, "message": "That bathroom STIIINKS!!!", "end": true }]
+  }
+}

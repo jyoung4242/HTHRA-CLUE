@@ -29,15 +29,67 @@ export default class KeyboardManagement {
         "2": { action: "showTriggers", repeat: false },
         "3": { action: "showCollisionBox", repeat: false },
         "4": { action: "toggleCamera", repeat: false },
-        " ": "interact",
+        Enter: { action: "interact", repeat: false },
       },
       (action: string, doing: boolean) => {
         if (doing) {
-          this.state.objects[0].status = "walk";
-          console.log(action);
-
           switch (action) {
             case "interact":
+              const player = this.state.objects[0];
+              if (this.state.cutscenes.isCutscenePlaying) return;
+              //is there an interactable object in front of you?
+              switch (this.state.objects[0].direction) {
+                case "down":
+                  for (let index = 1; index < this.state.objects.length; index++) {
+                    const element = this.state.objects[index];
+                    if (element.interact.length == 0) return false;
+                    const rstl = this.checkForObject(element, "down");
+                    if (rstl) {
+                      //fire off cutscene of objects 'interactions'
+                      this.cutscenes = new CutsceneManager(element.interact, this.state, player);
+                      this.cutscenes.startCutscene();
+                    }
+                  }
+
+                  break;
+                case "up":
+                  for (let index = 1; index < this.state.objects.length; index++) {
+                    const element = this.state.objects[index];
+                    if (element.interact.length == 0) return false;
+                    const rstl = this.checkForObject(element, "up");
+                    if (rstl) {
+                      //fire off cutscene of objects 'interactions'
+                      this.cutscenes = new CutsceneManager(element.interact, this.state, player);
+                      this.cutscenes.startCutscene();
+                    }
+                  }
+                  break;
+                case "left":
+                  for (let index = 1; index < this.state.objects.length; index++) {
+                    const element = this.state.objects[index];
+                    if (element.interact.length == 0) return false;
+                    const rstl = this.checkForObject(element, "left");
+                    if (rstl) {
+                      //fire off cutscene of objects 'interactions'
+                      this.cutscenes = new CutsceneManager(element.interact, this.state, player);
+                      this.cutscenes.startCutscene();
+                    }
+                  }
+                  break;
+                case "right":
+                  for (let index = 1; index < this.state.objects.length; index++) {
+                    const element = this.state.objects[index];
+                    if (element.interact.length == 0) return false;
+                    const rstl = this.checkForObject(element, "right");
+                    if (rstl) {
+                      //fire off cutscene of objects 'interactions'
+                      this.cutscenes = new CutsceneManager(element.interact, this.state, player);
+                      this.cutscenes.startCutscene();
+                    }
+                  }
+                  break;
+              }
+              //oh, there is, then engage its 'interact actions'
               break;
             case "toggleCamera":
               if (this.state.camera.follow == this.state.objects[0]) this.state.camera.follow = this.state.objects[1];
@@ -62,6 +114,7 @@ export default class KeyboardManagement {
               else this.state.map.showTriggers = true;
               break;
             case "walk-left":
+              this.state.objects[0].status = "walk";
               if ((this.lastkey == null || this.lastkey == "left") && !this.state.cutscenes.isCutscenePlaying) {
                 this.keyLeft = true;
                 this.state.objects[0].direction = "left";
@@ -70,14 +123,16 @@ export default class KeyboardManagement {
                 //add Trigger check
                 const trgRslt: TriggerCheck = this.cm.isTriggerCollision(this.state.objects[0], "left");
                 if (trgRslt.result == true) {
-                  if (trgRslt.actions) this.cutscenes = new CutsceneManager(trgRslt.actions, this.state);
-                  this.cutscenes.startCutscene();
-                  this.keyLeft = false;
+                  if (trgRslt.actions) {
+                    this.cutscenes = new CutsceneManager(trgRslt.actions, this.state, this.state.objects[0]);
+                    this.cutscenes.startCutscene();
+                  }
                 }
               }
 
               break;
             case "walk-right":
+              this.state.objects[0].status = "walk";
               if ((this.lastkey == null || this.lastkey == "right") && !this.state.cutscenes.isCutscenePlaying) {
                 this.state.objects[0].direction = "right";
                 this.keyRight = true;
@@ -86,14 +141,16 @@ export default class KeyboardManagement {
                 //add Trigger check
                 const trgRslt: TriggerCheck = this.cm.isTriggerCollision(this.state.objects[0], "right");
                 if (trgRslt.result == true) {
-                  if (trgRslt.actions) this.cutscenes = new CutsceneManager(trgRslt.actions, this.state);
-                  this.cutscenes.startCutscene();
-                  this.keyRight = false;
+                  if (trgRslt.actions) {
+                    this.cutscenes = new CutsceneManager(trgRslt.actions, this.state, this.state.objects[0]);
+                    this.cutscenes.startCutscene();
+                  }
                 }
               }
 
               break;
             case "walk-up":
+              this.state.objects[0].status = "walk";
               if ((this.lastkey == null || this.lastkey == "up") && !this.state.cutscenes.isCutscenePlaying) {
                 this.state.objects[0].direction = "up";
                 this.keyUp = true;
@@ -102,14 +159,16 @@ export default class KeyboardManagement {
                 //add Trigger check
                 const trgRslt: TriggerCheck = this.cm.isTriggerCollision(this.state.objects[0], "up");
                 if (trgRslt.result == true) {
-                  if (trgRslt.actions) this.cutscenes = new CutsceneManager(trgRslt.actions, this.state);
-                  this.keyUp = false;
-                  this.cutscenes.startCutscene();
+                  if (trgRslt.actions) {
+                    this.cutscenes = new CutsceneManager(trgRslt.actions, this.state, this.state.objects[0]);
+                    this.cutscenes.startCutscene();
+                  }
                 }
               }
 
               break;
             case "walk-down":
+              this.state.objects[0].status = "walk";
               if ((this.lastkey == null || this.lastkey == "down") && !this.state.cutscenes.isCutscenePlaying) {
                 this.state.objects[0].direction = "down";
                 this.lastkey = "down";
@@ -118,16 +177,15 @@ export default class KeyboardManagement {
                 //add Trigger check
                 const trgRslt: TriggerCheck = this.cm.isTriggerCollision(this.state.objects[0], "down");
                 if (trgRslt.result == true) {
-                  if (trgRslt.actions) this.cutscenes = new CutsceneManager(trgRslt.actions, this.state);
-                  this.cutscenes.startCutscene();
-                  this.keyDown = false;
+                  if (trgRslt.actions) {
+                    this.cutscenes = new CutsceneManager(trgRslt.actions, this.state, this.state.objects[0]);
+                    this.cutscenes.startCutscene();
+                  }
                 }
               }
               break;
           }
         } else {
-          console.log(action, doing);
-
           switch (action) {
             case "walk-left":
               this.keyLeft = false;
@@ -150,5 +208,44 @@ export default class KeyboardManagement {
         }
       }
     );
+  }
+
+  rad2angle(rad: number): number {
+    const pi = Math.PI;
+    return rad * (180 / pi);
+  }
+
+  checkForObject(obj: any, dir: string): boolean {
+    const x1 = obj.x;
+    const y1 = obj.y;
+    const x2 = this.state.objects[0].x;
+    const y2 = this.state.objects[0].y;
+    const xs = (x2 - x1) * (x2 - x1);
+    const ys = (y2 - y1) * (y2 - y1);
+    const distance = Math.sqrt(xs + ys);
+
+    if (distance < 17) {
+      const rads = Math.atan2(y2 - y1, x2 - x1);
+      const angle = this.rad2angle(rads);
+      switch (dir) {
+        case "down":
+          if (angle >= -160 && angle <= -25) return true;
+          else return false;
+          break;
+        case "up":
+          if (angle <= 160 && angle >= 25) return true;
+          else return false;
+          break;
+        case "left":
+          if (angle <= 65 || angle >= -65) return true;
+          else return false;
+          break;
+        case "right":
+          if (angle >= 125 || angle <= -125) return true;
+          else return false;
+          break;
+      }
+    }
+    return false;
   }
 }

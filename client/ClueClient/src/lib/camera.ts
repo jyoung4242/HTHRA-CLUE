@@ -39,12 +39,21 @@ export default class Camera {
       
         ${this.mapManager.template}
         ${this.objects.template}
+     
       
     </div>
     `;
     const demoMap = {
       config: {
-        triggers: [{ x: 107, y: 45, w: 24, h: 24, actions: [{ type: "popup", text: "CUTSCENE STARTED!" }] }],
+        triggers: [
+          {
+            x: 107,
+            y: 45,
+            w: 24,
+            h: 24,
+            actions: [{ type: "dialog", dialogId: "floortile" }],
+          },
+        ],
         walls: [
           { x: 48, y: 45, w: 28, h: 24 },
           { x: 0, y: 35, w: 100, h: 27 },

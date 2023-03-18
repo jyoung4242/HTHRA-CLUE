@@ -4,10 +4,12 @@ export default class CutsceneManager {
   id: any;
   actions: any;
   actionLoopIndex = 0;
+  who: any;
   state;
-  constructor(actions: Array<object>, state: any) {
+  constructor(actions: Array<object>, state: any, who: any) {
     this.actions = actions;
     this.state = state;
+    this.who = who;
   }
 
   startCutscene() {
@@ -17,8 +19,9 @@ export default class CutsceneManager {
 
   async doActionEvents() {
     let eventConfig = this.actions[this.actionLoopIndex];
-    eventConfig.who = this.id;
-    const eventHandler = new OverworldEvent({ state: this.state.state, event: eventConfig });
+    eventConfig.who = this.who;
+
+    const eventHandler = new OverworldEvent({ state: this.state, event: eventConfig });
     await eventHandler.init();
 
     this.actionLoopIndex += 1;
