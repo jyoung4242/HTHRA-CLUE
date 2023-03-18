@@ -83,7 +83,6 @@ export default class OverworldEvent {
 
   dialog(resolve: any) {
     const textcompleteHandler = (e: any) => {
-      console.log("done: ", e.detail.whoID, this.event.who);
       if (e.detail.whoID === this.event.who) {
         document.removeEventListener("DialogComplete", textcompleteHandler);
         this.state.cutscenes.isCutscenePlaying = false;
@@ -97,21 +96,6 @@ export default class OverworldEvent {
     this.state.dialog.dm.startDialog(this.event.dialogId);
   }
   /* 
-  textMessage(resolve: any) {
-    if (this.event.faceHero) {
-      const obj = this.map.gameObjects[this.event.faceHero];
-      obj.direction = utils.oppoDirection(this.map.gameObjects["hero"].direction);
-    }
-
-    const msg = new TextMessage({
-      text: this.event.text,
-      onComplete: () => {
-        resolve();
-      },
-    });
-
-    msg.init(document.querySelector(".game-container"));
-  }
 
   changeMap(resolve: any) {
     const sceneTransition = new SceneTransition();
@@ -125,17 +109,6 @@ export default class OverworldEvent {
 
       sceneTransition.fadeOut();
     });
-  }
-
-  battle(resolve: any) {
-    
-    const battle = new Battle({
-      enemy: Enemies[this.event.enemyId],
-      onComplete: () => {
-        resolve();
-      },
-    });
-    battle.init(document.querySelector(".game-container"));
   }
 
   pause(resolve: any) {

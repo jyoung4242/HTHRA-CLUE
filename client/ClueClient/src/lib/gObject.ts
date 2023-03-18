@@ -201,6 +201,7 @@ export default class GameObject {
   }
 
   update() {
+    if (this.state.state.cutscenes.isCutscenePlaying) return;
     if (this.movingProgressRemaining > 0) {
       //update position if moving
       this.updatePosition();
