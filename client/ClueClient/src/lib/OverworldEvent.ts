@@ -8,9 +8,15 @@ type OverworldEventParam = {
   distance?: number;
   text?: string;
   dialogId: string;
+  emoteType: string;
+  wait: boolean;
+  magnitude: number;
+  interval: number;
+  shaketype: string;
+  flag: any;
+  newMap: string;
+  startingLocation: { x: number; y: number };
 };
-
-import SF from "../state/storyflags.json";
 
 export default class OverworldEvent {
   //map: any;
@@ -81,6 +87,27 @@ export default class OverworldEvent {
     document.addEventListener("PersonWalkingComplete", completeHandler);
   }
 
+  cameraShake(resolve: any) {
+    console.log("here");
+    //shake(shakeType: ShakeDirection, magnitude: number, duration: number, interval: number)
+
+    const completeHandler = (e: any) => {
+      console.log("done");
+
+      document.removeEventListener("cameraShakeComplete", completeHandler);
+      resolve();
+    };
+
+    document.addEventListener("cameraShakeComplete", completeHandler);
+    this.state.camera.camera.shake(this.event.shaketype, this.event.magnitude, this.event.duration, this.event.interval);
+  }
+
+  cameraflash(resolve: any) {
+    console.log("here");
+    this.state.camera.camera.flash();
+    resolve();
+  }
+
   dialog(resolve: any) {
     const textcompleteHandler = (e: any) => {
       if (e.detail.whoID === this.event.who) {
@@ -95,22 +122,34 @@ export default class OverworldEvent {
     document.addEventListener("DialogComplete", textcompleteHandler);
     this.state.dialog.dm.startDialog(this.event.dialogId);
   }
-  /* 
 
-  changeMap(resolve: any) {
-    const sceneTransition = new SceneTransition();
-    sceneTransition.init(document.querySelector(".game-container"), () => {
-      this.map.overworld.startMap(window.OverworldMaps[this.event.map], {
-        x: this.event.x,
-        y: this.event.y,
-        direction: this.event.direction,
-      });
-      resolve();
-
-      sceneTransition.fadeOut();
-    });
+  setStoryFlag(resolve: any) {
+    this.state.storyFlags[this.event.flag] = true;
+    resolve();
   }
 
+  changeMap(resolve: any) {
+    this.state.cutscenes.isCutscenePlaying = true;
+    const who: any = this.state.objects[this.event.who];
+    const newmap = this.event.newMap;
+    const startingX = this.event.startingLocation.x;
+    const startingY = this.event.startingLocation.y;
+    console.log(newmap);
+
+    this.state.viewport.maptransition = true;
+    sleep(0.5);
+    this.state.camera.camera.mapManager.switchMap(newmap);
+
+    who.x = startingX;
+    who.y = startingY;
+    who.direction = "down";
+    who.status = "idle";
+    this.state.viewport.maptransition = false;
+    resolve();
+    this.state.cutscenes.isCutscenePlaying = false;
+    console.log(this.state);
+  }
+  /*
   pause(resolve: any) {
     this.map.isPaused = true;
     
@@ -125,24 +164,42 @@ export default class OverworldEvent {
     menu.init(document.querySelector(".game-container"));
   }
 
-  addStoryFlag(resolve: any) {
-    window.playerState.storyFlags[this.event.flag] = true;
-    resolve();
-  }
+  
+   */
 
-  craftingMenu(resolve: any) {
-    const menu = new CraftingMenu({
-      pizzas: this.event.pizzas,
-      onComplete: () => {
-        resolve();
-      },
+  emote(resolve: any) {
+    const whoIndex = this.state.objects.findIndex((obj: any) => {
+      return obj.id === this.event.who;
     });
-    menu.init(document.querySelector(".game-container"));
-  } */
+
+    if (whoIndex < 0) {
+      resolve();
+      return;
+    }
+    const who = this.state.objects[whoIndex];
+    const completeHandler = (e: any) => {
+      if (e.detail.whoID === this.event.who) {
+        document.removeEventListener("emoteComplete", completeHandler);
+        resolve();
+      }
+    };
+    document.addEventListener("emoteComplete", completeHandler);
+
+    who.startBehavior({
+      type: "emote",
+      emoteType: this.event.emoteType,
+      duration: this.event.duration,
+      wait: this.event.wait,
+    });
+  }
 
   init() {
     return new Promise(resolve => {
       this[this.event.type](resolve);
     });
   }
+}
+
+async function sleep(seconds: number) {
+  return new Promise(resolve => setTimeout(resolve, seconds * 1000));
 }

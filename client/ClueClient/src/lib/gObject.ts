@@ -2,11 +2,18 @@ type animationTypes = `${statusTypes}-${directionTypes}`;
 type statusTypes = "idle" | "walk";
 export type directionTypes = "up" | "down" | "left" | "right";
 
+import dots from "../assets/images/emote_dots3.png";
+import happy from "../assets/images/emote_faceHappy.png";
+import angry from "../assets/images/emote_faceAngry.png";
+import excited from "../assets/images/emote_exclamations.png";
+import alerted from "../assets/images/emote_exclamation.png";
+
 import CollisionManager from "./collision";
 import OverworldEvent from "./OverworldEvent";
 import { WALKSPEED } from "./keyboard";
 
 export default class GameObject {
+  map: "none";
   state: any;
   cm;
   isColliding = false;
@@ -44,6 +51,8 @@ export default class GameObject {
   }
   type = "";
   shadow = false;
+  emote = false;
+  emoteSrc = "";
   direction: directionTypes = "down";
   status: statusTypes = "idle";
   tik = 0;
@@ -92,7 +101,10 @@ export default class GameObject {
   };
 
   constructor(state: any, config: any) {
+    this.map = config.map;
     this.state = state;
+    console.log(state);
+
     this.cm = new CollisionManager(state);
     this.id = config.id;
     this.sprtposX = config.sprtposX;
@@ -183,7 +195,8 @@ export default class GameObject {
   }
 
   startBehavior(behavior: any) {
-    this.direction = behavior.direction;
+    if (behavior.direction) this.direction = behavior.direction;
+
     if (behavior.type === "walk") {
       this.movingProgressRemaining = behavior.distance / 3;
       this.status = "walk";
@@ -198,9 +211,49 @@ export default class GameObject {
         this.isStanding = false;
       }, behavior.time);
     }
+
+    if (behavior.type == "emote") {
+      this.status = "idle";
+      switch (behavior.emoteType) {
+        case "busy":
+          this.emoteSrc = dots;
+          break;
+        case "angry":
+          this.emoteSrc = angry;
+          break;
+        case "happy":
+          this.emoteSrc = happy;
+          break;
+        case "excited":
+          this.emoteSrc = excited;
+          break;
+        case "alerted":
+          this.emoteSrc = alerted;
+          break;
+        default:
+          return;
+      }
+      this.emote = true;
+      setTimeout(() => {
+        this.emote = false;
+        if (behavior.wait) {
+          const event = new CustomEvent("emoteComplete", { detail: { whoID: this.id } });
+          document.dispatchEvent(event);
+        }
+      }, behavior.duration);
+
+      if (!behavior.wait) {
+        setTimeout(() => {
+          const event = new CustomEvent("emoteComplete", { detail: { whoID: this.id } });
+          const dispatchRslt = document.dispatchEvent(event);
+        }, 100);
+      }
+    }
   }
 
   update() {
+    if (!this.state.state) console.log(this);
+
     if (this.state.state.cutscenes.isCutscenePlaying) return;
     if (this.movingProgressRemaining > 0) {
       //update position if moving

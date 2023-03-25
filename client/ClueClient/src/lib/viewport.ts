@@ -14,6 +14,7 @@ export default class Viewport {
     this.template = `
     <div class="viewport" style="width: ${width}px; height: ${height}px;">
       <div style="position: relative; width:100%; height: 100%;">
+        <div class="mapTransition"  \${===viewport.maptransition}></div>
         ${this.camera.template}
         ${this.state.dialog.dm.template}
       </div>

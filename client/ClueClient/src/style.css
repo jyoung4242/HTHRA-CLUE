@@ -38,6 +38,20 @@
   transition: transform 0.1s linear;
 }
 
+.flash {
+  background-color: #ffffff;
+  opacity: 1;
+  width: 100%;
+  height: 100%;
+  z-index: 99999;
+  position: relative;
+  transition: opacity 0.3s linear;
+}
+
+.flash.pui-removing {
+  opacity: 0;
+}
+
 .player {
   position: absolute;
   top: 0;
@@ -66,6 +80,15 @@
   background-image: url("./assets/images/shadow.png");
   z-index: 2;
 }
+.emote {
+  position: absolute;
+  top: -5px;
+  right: 5px;
+  width: 16px;
+  height: 16px;
+  image-rendering: pixelated;
+  z-index: 6;
+}
 
 .collisionbox {
   position: absolute;
@@ -80,6 +103,24 @@
   left: 0;
   image-rendering: pixelated;
   background-size: cover;
+}
+
+.mapTransition {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.4s linear;
+}
+
+.mapTransition.pui-removing {
+  opacity: 1;
+}
+
+.mapTransition.pui-removing {
+  opacity: 0;
 }
 
 .wall {

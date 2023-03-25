@@ -27,6 +27,7 @@ export default class State {
       viewport: {
         x: 0,
         y: 0,
+        maptransition: false,
       },
       camera: {
         x: 0,
@@ -35,6 +36,8 @@ export default class State {
         h: 200,
         scale: 3,
         follow: <GameObject | null>null,
+        camera: undefined,
+        flash: false,
       },
       map: {
         currentMap: <keyof mapConfigData>"none",
@@ -133,6 +136,7 @@ export default class State {
       },
       objects: [
         new GameObject(this, {
+          map: "demo",
           id: 0,
           sprtposX: 0,
           sprtposY: 0,
@@ -159,6 +163,7 @@ export default class State {
           behaviorLoop: [],
         }),
         new GameObject(this, {
+          map: "demo",
           id: 1,
           sprtposX: 0,
           sprtposY: 0,
@@ -196,9 +201,13 @@ export default class State {
             { type: "walk", direction: "left", distance: 24 },
             { type: "stand", direction: "right", duration: 750 },
             { type: "stand", direction: "down", duration: 750 },
+            { type: "emote", duration: 2000, emoteType: "alerted", wait: true },
           ],
         }),
       ],
+      get renderedObjects() {
+        return this.objects.filter((obj: any) => obj.map == this.map.currentMap);
+      },
       cutscenes: {
         isCutscenePlaying: false,
       },
