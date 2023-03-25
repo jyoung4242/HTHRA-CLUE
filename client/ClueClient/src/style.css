@@ -107,19 +107,21 @@
 
 .mapTransition {
   position: absolute;
+  background-color: #ffffff;
+  z-index: 9999;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  opacity: 0;
-  transition: opacity 0.4s linear;
-}
-
-.mapTransition.pui-removing {
   opacity: 1;
+  transition: opacity 0.25s linear;
 }
 
 .mapTransition.pui-removing {
+  opacity: 0;
+}
+
+.mapTransition.pui-adding {
   opacity: 0;
 }
 

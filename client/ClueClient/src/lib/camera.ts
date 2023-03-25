@@ -96,7 +96,7 @@ export default class Camera {
             w: 24,
             h: 24,
             actions: [
-              { type: "changeMap", newMap: "outside", startingLocation: { x: 100, y: 100 }, who: this.state.objects[0] },
+              { type: "changeMap", newMap: "outside", startingLocation: { x: 105, y: 75 }, who: this.state.objects[0] },
             ],
           },
         ],

@@ -215,8 +215,24 @@ export default class KeyboardManagement {
               this.cutscenes.startCutscene();
               break;
             case "changemap":
+              let newmap = "";
+              let newx = 0;
+              let newy = 0;
+
+              if (this.state.map.currentMap == "demo") {
+                newmap = "outside";
+                newx = 105;
+                newy = 75;
+              } else {
+                newmap = "demo";
+                newx = 50;
+                newy = 70;
+              }
+
+              this.state.objects[0].map = newmap;
+
               this.cutscenes = new CutsceneManager(
-                [{ type: "changeMap", newMap: "outside", startingLocation: { x: 100, y: 100 }, who: this.state.objects[0] }],
+                [{ type: "changeMap", newMap: newmap, startingLocation: { x: newx, y: newy }, who: this.state.objects[0] }],
                 this.state,
                 this.state.objects[0]
               );

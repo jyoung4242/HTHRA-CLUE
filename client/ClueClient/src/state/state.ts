@@ -45,9 +45,16 @@ export default class State {
         showTriggers: false,
         maps: <MapData>{},
         configs: <any>{},
+        /*
         get selectMap() {
+          console.log(this.maps[this.currentMap]);
+
           return this.maps[this.currentMap];
-        },
+        },*/
+        selectMap: [
+          { id: 0, z: 0, src: "", w: 0, h: 0 },
+          { id: 1, z: 5, src: "", w: 0, h: 0 },
+        ],
         get getWalls() {
           return this.configs[this.currentMap].walls;
         },

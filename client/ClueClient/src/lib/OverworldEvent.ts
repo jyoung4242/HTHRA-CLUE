@@ -128,7 +128,7 @@ export default class OverworldEvent {
     resolve();
   }
 
-  changeMap(resolve: any) {
+  async changeMap(resolve: any) {
     this.state.cutscenes.isCutscenePlaying = true;
     const who: any = this.state.objects[this.event.who];
     const newmap = this.event.newMap;
@@ -137,13 +137,16 @@ export default class OverworldEvent {
     console.log(newmap);
 
     this.state.viewport.maptransition = true;
-    sleep(0.5);
+    await sleep(0.3);
     this.state.camera.camera.mapManager.switchMap(newmap);
+    //this.state.map.currentMap = newmap;
 
+    who.map = newmap;
     who.x = startingX;
     who.y = startingY;
     who.direction = "down";
     who.status = "idle";
+    await sleep(0.3);
     this.state.viewport.maptransition = false;
     resolve();
     this.state.cutscenes.isCutscenePlaying = false;

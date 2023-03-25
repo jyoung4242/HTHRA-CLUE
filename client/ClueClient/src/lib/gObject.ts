@@ -103,7 +103,6 @@ export default class GameObject {
   constructor(state: any, config: any) {
     this.map = config.map;
     this.state = state;
-    console.log(state);
 
     this.cm = new CollisionManager(state);
     this.id = config.id;
@@ -252,8 +251,6 @@ export default class GameObject {
   }
 
   update() {
-    if (!this.state.state) console.log(this);
-
     if (this.state.state.cutscenes.isCutscenePlaying) return;
     if (this.movingProgressRemaining > 0) {
       //update position if moving

@@ -46,11 +46,23 @@ export default class MapManager {
   }
 
   switchMap(name: string) {
-    console.log(this.state.map.maps[name]);
+    console.log("state map data: ", this.state.map.maps[name]);
+    console.log("selected map array: ", this.state.map.selectMap[0], this.state.map.selectMap[1]);
+    this.state.map.currentMap = name;
+    this.state.map.maps[name].forEach((m: any, i: number) => {
+      console.log(i);
 
-    if (this.state.map.maps[name]) {
+      this.state.map.selectMap[i].src = m.src;
+      this.state.map.selectMap[i].w = m.w;
+      this.state.map.selectMap[i].h = m.h;
+      this.state.map.selectMap[i].z = m.z;
+    });
+
+    console.log("selected map array: ", this.state.map.selectMap[0], this.state.map.selectMap[1]);
+    console.log("state: ", this.state);
+    /* if (this.state.map.maps[name]) {
       console.log(name);
       this.state.map.currentMap = name;
-    }
+    } */
   }
 }
