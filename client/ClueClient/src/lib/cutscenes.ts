@@ -19,7 +19,7 @@ export default class CutsceneManager {
 
   async doActionEvents() {
     let eventConfig = this.actions[this.actionLoopIndex];
-    eventConfig.who = this.who;
+    eventConfig.who = this.who.id;
 
     const eventHandler = new OverworldEvent({ state: this.state, event: eventConfig });
     await eventHandler.init();

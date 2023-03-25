@@ -2,6 +2,9 @@ import { Input } from "@peasy-lib/peasy-input";
 import CollisionManager from "./collision";
 import CutsceneManager from "./cutscenes";
 import { TriggerCheck } from "./collision";
+import { Chance } from "chance";
+
+const chance = new Chance();
 
 export const WALKSPEED = 3;
 
@@ -29,6 +32,10 @@ export default class KeyboardManagement {
         "2": { action: "showTriggers", repeat: false },
         "3": { action: "showCollisionBox", repeat: false },
         "4": { action: "toggleCamera", repeat: false },
+        "5": { action: "emote", repeat: false },
+        "6": { action: "shake", repeat: false },
+        "7": { action: "flash", repeat: false },
+        "8": { action: "changemap", repeat: false },
         Enter: { action: "interact", repeat: false },
       },
       (action: string, doing: boolean) => {
@@ -183,6 +190,53 @@ export default class KeyboardManagement {
                   }
                 }
               }
+              break;
+            case "emote":
+              const emotter = this.state.objects[0];
+              const eType = chance.pickone(["busy", "angry", "happy", "excited", "alerted"]);
+
+              this.cutscenes = new CutsceneManager(
+                [{ type: "emote", emoteType: eType, duration: 4000, wait: chance.bool() }],
+                this.state,
+                emotter
+              );
+              this.cutscenes.startCutscene();
+              break;
+            case "shake":
+              this.cutscenes = new CutsceneManager(
+                [{ type: "cameraShake", duration: 750, magnitude: 3, interval: 5, shaketype: "random" }],
+                this.state,
+                this.state.objects[0]
+              );
+              this.cutscenes.startCutscene();
+              break;
+            case "flash":
+              this.cutscenes = new CutsceneManager([{ type: "cameraflash" }], this.state, this.state.objects[0]);
+              this.cutscenes.startCutscene();
+              break;
+            case "changemap":
+              let newmap = "";
+              let newx = 0;
+              let newy = 0;
+
+              if (this.state.map.currentMap == "demo") {
+                newmap = "outside";
+                newx = 105;
+                newy = 75;
+              } else {
+                newmap = "demo";
+                newx = 50;
+                newy = 70;
+              }
+
+              this.state.objects[0].map = newmap;
+
+              this.cutscenes = new CutsceneManager(
+                [{ type: "changeMap", newMap: newmap, startingLocation: { x: newx, y: newy }, who: this.state.objects[0] }],
+                this.state,
+                this.state.objects[0]
+              );
+              this.cutscenes.startCutscene();
               break;
           }
         } else {
